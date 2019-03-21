@@ -1,4 +1,4 @@
-# skywai-interactivison
+# skyway-interactivison
 SKYWAY(https://webrtc.ecl.ntt.com/)を利用したインタラクティビジョン用ソフトウェア
 
 # Dependency
@@ -124,4 +124,20 @@ TemplateDeploymentから下記JSONをテンプレートととして呼び出し�
     }
   ]
 }
+</pre>
+
+
+# Usage
+デプロイ後、発行プロファイルをダウンロードし、
+- FTPサーバー
+- FTPユーザー名
+- FTPパスワード
+を取得する。
+
+その後、wwwRootにアクセスしたら、key.jsを変更する。
+（ダウンロードしてから、変更して再アップロードする）
+<pre>
+window.__SKYWAY_KEY__ 	= 'REPLACE_WITH_YOUR_API_KEY';
+window.__SKYWAY_ROOM__ 	= 'REPLACE_WITH_YOUR_ROOM_NAME';
+INITIALIZE_MUTE	= true;
 </pre>
