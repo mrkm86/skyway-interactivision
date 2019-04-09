@@ -444,7 +444,7 @@ $(function () {
         elmHTML += 'style="height:100%; width:100%; float:left;"';
         elmHTML += '>';
         elmHTML += '  <div class="group_video_child">';
-        elmHTML += '    <div class="peer-mic peer-mic_' + peerId + '"></div>';
+        elmHTML += '    <div class="peer-mic peer-mic_' + peerId + ' item-visible"></div>';
         elmHTML += '    <video class="remoteVideos" autoplay playsinline>';
         elmHTML += '  </div>';
         elmHTML += '</div>';
@@ -454,7 +454,7 @@ $(function () {
         elmHTML += 'style="height:' + (iHeightBody / 2) + 'px;width:' + (iWidthBody / 2) + 'px;float:left;"';
         elmHTML += '>';
         elmHTML += '  <div class="group_video_child">';
-        elmHTML += '    <div class="peer-mic peer-mic_' + peerId + '"></div>';
+        elmHTML += '    <div class="peer-mic peer-mic_' + peerId + ' item-visible"></div>';
         elmHTML += '    <video class="remoteVideos" autoplay playsinline>';
         elmHTML += '  </div>';
         elmHTML += '</div>';
