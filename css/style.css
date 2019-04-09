@@ -72,6 +72,7 @@ Copyright (c) Nicolas Gallagher and Jonathan Neal
   width: 25%;
   top: 5;
   left: 0;
+  display: none; /**/
 }
 .peer-mic {
   position: absolute;
@@ -79,7 +80,8 @@ Copyright (c) Nicolas Gallagher and Jonathan Neal
   height: 50px;
   width: 50px;
   top: 10;
-  left: 10;
+  /*left: 10;*/ 
+  margin-left: 10px;
 }
 .peer-mic-on {
   background: transparent url('../img/Mic_On.png') no-repeat center;
@@ -97,15 +99,21 @@ Copyright (c) Nicolas Gallagher and Jonathan Neal
   width: 100%;
   height: 100%;
   object-fit: unset;
+  margin: 0 auto; /**/
 }
 .my-video-multi {
-  width: 150px;
-  height: 110px;
+  width: 150px !important;
+  height: 110px !important;
   object-fit: unset;
   position: absolute;
   bottom: 10;
   right: 10;
 }
+
+.group_video_child {
+  margin: 0 auto;
+}
+
 .remoteVideos {
   position: -webkit-sticky;
   background-color: #eee;

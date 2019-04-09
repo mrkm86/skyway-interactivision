@@ -14,6 +14,11 @@ $(function () {
   var mouseMoveInterval = null;
   var dtMove = new Date();
 
+  var iXScale = 0;
+  var iYScale = 0;
+  //Re calculate ratio 16:9
+  fncReCalcRatio169(iWidthBody, iHeightBody);
+
   //Set title
   document.title = window.__SKYWAY_ROOM__;
   //Set title for Modal
@@ -44,13 +49,25 @@ $(function () {
     }
 
     $(window).bind('resize', function () {
-      if ($('.remoteVideos').length == 1) {
-        $('#their-videos').css('max-height', $('body').height() + 'px');
-        $('.remoteVideos:first').css('height', '100%');
-        $('.remoteVideos:first').css('width', '100%');
+      $('#their-videos').css('max-height', $('body').height() + 'px');
 
-        $('.group_video:first').removeAttr('style');
-        $('.group_video:first').attr('style', 'height: 100%; width: 100%;float:left;');
+      //Get body size after size changed
+      iWidthBody = $('body').width();
+      iHeightBody = $('body').height();
+      //Re calculate ratio 16:9
+      fncReCalcRatio169(iWidthBody, iHeightBody);
+      
+      if ($('.remoteVideos').length == 1) {
+        $('.group_video_child').css('height', iYScale + 'px');
+        $('.group_video_child').css('width', iXScale + 'px');
+        $('.group_video').removeAttr('style');
+        $('.group_video').attr('style', 'height: 100%; width: 100%;float:left;');
+      }
+      else {
+        $('.group_video_child').css('height', (iYScale / 2) + 'px');
+        $('.group_video_child').css('width', (iXScale / 2) + 'px');
+        $('.group_video').removeAttr('style');
+        $('.group_video').attr('style', 'height:' + (iHeightBody / 2) + 'px;width:' + (iWidthBody / 2) + 'px;float:left;');
       }
     });
 
@@ -100,6 +117,9 @@ $(function () {
           $('#wrapp-video').removeClass('my-video-multi');
           $('#wrapp-video').addClass('my-video-single');
           $('#self-mic').addClass('item-visible');
+          
+          $('#wrapp-video').css('height', iYScale + 'px');
+          $('#wrapp-video').css('width', iXScale + 'px');
         }
 
         //Set call status
@@ -380,14 +400,16 @@ $(function () {
       $('#wrapp-video').removeClass('my-video-multi');
       $('#wrapp-video').addClass('my-video-single');
       $('#self-mic').addClass('item-visible');
+
+      $('#wrapp-video').css('height', iYScale + 'px');
+      $('#wrapp-video').css('width', iXScale + 'px');
     }
     //Resize camera first For multi video (Width/Height Fixed -> Width/Height 100%)
     else if ($('.remoteVideos').length == 1) {
-      $('.remoteVideos:first').css('height', '100%');
-      $('.remoteVideos:first').css('width', '100%');
-
-      $('.group_video:first').removeAttr('style');
-      $('.group_video:first').attr('style', 'height: 100%; width: 100%;float:left;');
+      $('.group_video_child').css('height', iYScale + 'px');
+      $('.group_video_child').css('width', iXScale + 'px');
+      $('.group_video').removeAttr('style');
+      $('.group_video').attr('style', 'height: 100%; width: 100%;float:left;');
     }
   }
 
@@ -400,8 +422,8 @@ $(function () {
       const peerId = stream.peerId;
       const id = 'video_' + peerId + '_' + stream.id.replace('{', '').replace('}', '');
 
-      var iWidth = iWidthBody / 2;
-      var iHeight = iHeightBody / 2;
+      var iWidth = iXScale / 2;
+      var iHeight = iYScale / 2;
       var elmHTML = '';
 
       //Minimize Self Camera
@@ -421,39 +443,49 @@ $(function () {
         elmHTML += '<div class="group_video video_' + peerId + '" id="' + id + '"';
         elmHTML += 'style="height:100%; width:100%; float:left;"';
         elmHTML += '>';
-        elmHTML += '<div class="peer-mic peer-mic_' + peerId + '"></div>';
-        elmHTML += '<video class="remoteVideos" autoplay playsinline>';
+        elmHTML += '  <div class="group_video_child">';
+        elmHTML += '    <div class="peer-mic peer-mic_' + peerId + '"></div>';
+        elmHTML += '    <video class="remoteVideos" autoplay playsinline>';
+        elmHTML += '  </div>';
         elmHTML += '</div>';
       }
       else {
         elmHTML += '<div class="group_video video_' + peerId + '" id="' + id + '"';
-        elmHTML += 'style="height:' + iHeight + 'px;width:' + iWidth + 'px;float:left;"';
+        elmHTML += 'style="height:' + (iHeightBody / 2) + 'px;width:' + (iWidthBody / 2) + 'px;float:left;"';
         elmHTML += '>';
-        elmHTML += '<div class="peer-mic peer-mic_' + peerId + '"></div>';
-        elmHTML += '<video class="remoteVideos" autoplay playsinline>';
+        elmHTML += '  <div class="group_video_child">';
+        elmHTML += '    <div class="peer-mic peer-mic_' + peerId + '"></div>';
+        elmHTML += '    <video class="remoteVideos" autoplay playsinline>';
+        elmHTML += '  </div>';
         elmHTML += '</div>';
       }
 
       $('#their-videos').append(elmHTML);
-
+      
       //Resize camera first For multi video (Width/Height 100% -> Width/Height Fixed)
       if ($('.remoteVideos').length > 1) {
+        if ($('.group_video:first').width() != (iWidthBody / 2)) {
+          $('.group_video_child').css('height', iHeight + 'px');
+          $('.group_video_child').css('width', iWidth + 'px');
 
-        if ($('.remoteVideos:first').width() != iWidth) {
-          $('.remoteVideos:first').css('height', iHeight + 'px');
-          $('.remoteVideos:first').css('width', iWidth + 'px');
-
-          $('.group_video:first').removeAttr('style');
-          $('.group_video:first').attr('style', 'height:' + iHeight + 'px;width:' + iWidth + 'px;float:left;');
+          $('.group_video').removeAttr('style');
+          $('.group_video').attr('style', 'height:' + (iHeightBody / 2) + 'px;width:' + (iWidthBody / 2) + 'px;float:left;');
         }
-
+      }
+      else {
+          $('.group_video_child:first').css('height', iYScale + 'px');
+          $('.group_video_child:first').css('width', iXScale + 'px');
       }
 
       //Has scrollbar
       if ($('#their-videos').get(0).scrollHeight > iHeightBody) {
         iWidthBody = $('#their-videos').get(0).scrollWidth;
-        iWidth = iWidthBody / 2;
-        iHeight = iHeightBody / 2;
+
+        //Re calculate ratio 16:9
+        fncReCalcRatio169(iWidthBody, iHeightBody);
+        iWidth = iXScale / 2;
+        iHeight = iYScale / 2;
+
         $('.group_video').attr('style', 'height:' + iHeight + 'px;width:' + iWidth + 'px;float:left;');
       }
 
@@ -514,6 +546,21 @@ $(function () {
 
     if (second >= 3 && !$('#step2').is(":hidden")) {
       $('#step2').hide();
+    }
+  }
+
+  /****************************/
+  /** Calculate Ratio (16:9)**/
+  /****************************/
+  function fncReCalcRatio169(width, height){ 
+    var result = "";
+
+    iYScale  = Math.round((width/16)*9);
+    iXScale = width;
+    
+    if  (iYScale > height) {
+      iYScale = height;
+      iXScale  = Math.round((height/9)*16);
     }
   }
 });
