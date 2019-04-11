@@ -72,6 +72,7 @@ Copyright (c) Nicolas Gallagher and Jonathan Neal
   width: 25%;
   top: 5;
   left: 0;
+  display: none !important; /**/
 }
 .peer-mic {
   position: absolute;
