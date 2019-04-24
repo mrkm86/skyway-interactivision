@@ -9,11 +9,43 @@ $(function () {
   const STATUS_RETRY = "RETRY";
   const STATUS_CALLING = "CALLING";
   const STATUS_HANGUP = "HANGUP";
-  var mouseMoveInterval = null;
   var dtMove = new Date();
+  var selAspectRatio = 16/9;
+  var recvAspectRatio = 16/9;
 
   var iXScale = 0;
   var iYScale = 0;
+
+  var ResolutionToCheck = [
+    { width: 320, height: 320 },    //1:1
+    { width: 320, height: 180 },    //16:9
+    { width: 320, height: 240 },    //4:3
+    { width: 640, height: 640 },
+    { width: 640, height: 360 },
+    { width: 640, height: 480 },
+    { width: 1280, height: 1280 },
+    { width: 1280, height: 720 },
+    { width: 1280, height: 960 },
+    { width: 1920, height: 1920 },
+    { width: 1920, height: 1080 },
+    { width: 1920, height: 1440 }
+  ];
+
+  var ResolutionResult = [];
+  var selWidth = 320;
+  var selHeight = 240;
+  var indexCheck = 0;
+
+  //Add maximum resolution
+  for (indexCheck = 2; indexCheck < 23; indexCheck++) {
+    var number = 500;
+    ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: 1920 + (number * indexCheck) });
+    ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: 1080 + (number * indexCheck) });
+    ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: 1440 + (number * indexCheck) });
+  }
+
+  //Reset idnex check
+  indexCheck = 0;
 
   //Set title
   document.title = window.__SKYWAY_ROOM__;
@@ -59,7 +91,7 @@ $(function () {
     });
 
     //Show/Hide function bar
-    $('body').mousemove(function(event){
+    $('body').mousemove(function (event) {
       $('#step2').show();
       dtMove = new Date();
     });
@@ -104,7 +136,7 @@ $(function () {
           $('#wrapp-video').removeClass('my-video-multi');
           $('#wrapp-video').addClass('my-video-single');
           $('#self-mic').addClass('item-visible');
-          
+
           $('#wrapp-video').css('height', iYScale + 'px');
         }
 
@@ -115,7 +147,8 @@ $(function () {
         window.close();
       }
       else if ($(this).hasClass('button-retry')) {
-        step1();
+        //step1();
+        fnc_GetCameraAspectRatio();
       }
       //hangup or retry 
       else {
@@ -229,7 +262,8 @@ $(function () {
 
     peer.on('open', () => {
       // Get things started
-      step1();
+      //step1();
+      fnc_GetCameraAspectRatio();
     });
 
     peer.on('error', err => {
@@ -286,9 +320,9 @@ $(function () {
           }
         });
 
-        videoSelect.on('change', step1);
-        audioSelect.on('change', step1);
-        speakerSelect.on('change', step1);
+        videoSelect.on('change', fnc_GetCameraAspectRatio);
+        audioSelect.on('change', fnc_GetCameraAspectRatio);
+        speakerSelect.on('change', fnc_GetCameraAspectRatio);
       });
 
     //Reset devices when Change or Disabled devices.
@@ -312,7 +346,8 @@ $(function () {
 
     var dataSend = {
       ReSend: isResend,
-      Enabled: localAudioTrack.enabled
+      Enabled: localAudioTrack.enabled,
+      AspectRatio: selAspectRatio
     }
 
     room.send(dataSend);
@@ -325,11 +360,12 @@ $(function () {
     // Get audio/video stream
     const audioSource = $('#audioSource').val();
     const videoSource = $('#videoSource').val();
+
     const constraints = {
       audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
-      video: { deviceId: videoSource ? { exact: videoSource } : undefined },
+      video: { aspectRatio : selAspectRatio},
     };
-    
+
     //Get video stream for self video
     navigator.mediaDevices.getUserMedia(constraints).then(stream => {
       $('#my-video').get(0).srcObject = stream;
@@ -381,10 +417,10 @@ $(function () {
   /** Maximize Self Camera ***/
   /**************************/
   function maximizeCamera() {
-    
+
     //Re calculate ratio
-    fncReCalcRatio169();
-    
+    fncReCalcRatio();
+
     //Maximize Self Camera
     if ($('.remoteVideos').length == 0) {
       $('#seft-video').css('max-height', $('body').height() + 'px');
@@ -453,7 +489,7 @@ $(function () {
       }
 
       $('#their-videos').append(elmHTML);
-      
+
       //Resize camera first For multi video (Width/Height 100% -> Width/Height Fixed)
       if ($('.remoteVideos').length > 1) {
         if ($('.group_video:first').width() != (iWidth / 2)) {
@@ -464,6 +500,7 @@ $(function () {
       else {
       }
 
+      //Resize Image
       fncReCalcAfterResize();
 
       const el = $('#' + id).find('video').get(0);
@@ -490,6 +527,10 @@ $(function () {
         $('.peer-mic_' + peerId).removeClass('peer-mic-on');
         $('.peer-mic_' + peerId).addClass('peer-mic-off');
       }
+      
+      recvAspectRatio = data.AspectRatio;
+      //Resize Image
+      fncReCalcAfterResize();
 
       //First
       if (data.ReSend) {
@@ -516,7 +557,7 @@ $(function () {
   /****************************/
   /** Show/Hide Function bar **/
   /****************************/
-  function fncShowHideFunctionBar(){
+  function fncShowHideFunctionBar() {
     var second = (new Date).getTime() - dtMove.getTime();
     var miliSecond = second % 1000;
     second = (second - miliSecond) / 1000;
@@ -529,7 +570,7 @@ $(function () {
   /****************************/
   /** Calculate Ratio *********/
   /****************************/
-  function fncReCalcRatio169(){ 
+  function fncReCalcRatio() {
 
     var rateValue = 16/9;
     var iWidthBody = $('body').width();
@@ -537,56 +578,107 @@ $(function () {
     var iWidthScroll = 17;
     var iHeightRemote = ($('.group_video').length / 2) * $('.group_video').height();
 
-    if (localVideoTrack != null) {
-      rateValue = localVideoTrack.getSettings().width / localVideoTrack.getSettings().height;
+    if ($('.remoteVideos').length > 0) 
+    {
+      rateValue = recvAspectRatio;
+    }
+    else {
+      rateValue = selAspectRatio;
     }
 
-    iYScale  = Math.round(iWidthBody / rateValue);
+    iYScale = Math.round(iWidthBody / rateValue);
     iXScale = iWidthBody;
 
-    if  (iYScale <= iHeightBody)  return;
-    
-      if ($('.remoteVideos').length == 0 )
-      {
-        iYScale  = Math.round((iWidthBody - iWidthScroll) / rateValue);
-        iXScale = iWidthBody - iWidthScroll;
-      }
-      else if ($('.remoteVideos').length == 1 && iYScale > iHeightBody)
-      {
-        console.log('****' + iYScale);
-        iYScale  = Math.round((iWidthBody - iWidthScroll) / rateValue);
-        iXScale = iWidthBody - iWidthScroll;
-      }
-      else if ($('.remoteVideos').length > 1 && iHeightRemote > iHeightBody)
-      {
-        console.log('****' + (iYScale / 2));
-        iYScale  = Math.round((iWidthBody - iWidthScroll) / rateValue);
-        iXScale = iWidthBody - iWidthScroll;
-      }
+    if (iYScale <= iHeightBody) return;
+
+    if ($('.remoteVideos').length == 0) {
+      iYScale = Math.round((iWidthBody - iWidthScroll) / rateValue);
+      iXScale = iWidthBody - iWidthScroll;
+    }
+    else if ($('.remoteVideos').length == 1 && iYScale > iHeightBody) {
+      iYScale = Math.round((iWidthBody - iWidthScroll) / rateValue);
+      iXScale = iWidthBody - iWidthScroll;
+    }
+    else if ($('.remoteVideos').length > 1 && iHeightRemote > iHeightBody) {
+      iYScale = Math.round((iWidthBody - iWidthScroll) / rateValue);
+      iXScale = iWidthBody - iWidthScroll;
+    }
   }
-  
+
   /*********************************/
   /** Calculate width and height **/
   /*******************************/
-  function fncReCalcAfterResize()
-  {
-      var iWidth;
-      var iHeight;
+  function fncReCalcAfterResize() {
+    
+    //Single Camera
+    if ($('.group_video').length == 1) {
+      //Re calculate ratio
+      fncReCalcRatio();
+      $('.group_video').attr('style', 'height:' + iYScale + 'px;width:' + iXScale + 'px;float:left;');
+    }
+    //Multi Camera
+    else {
+      //Re calculate ratio
+      fncReCalcRatio();
+      var iWidth = iXScale / 2;
+      var iHeight = iYScale / 2;
 
-      //Single Camera
-      if ($('.group_video').length == 1){
-        //Re calculate ratio
-        fncReCalcRatio169();
-        $('.group_video').attr('style', 'height:' + iYScale + 'px;width:' + iXScale + 'px;float:left;');
-      }
-      //Multi Camera
-      else {
-        //Re calculate ratio
-        fncReCalcRatio169();
-        iWidth = iXScale / 2;
-        iHeight = iYScale / 2;
-
-        $('.group_video').attr('style', 'height:' + iHeight + 'px;width:' + iWidth + 'px;float:left;');
-      }
+      $('.group_video').attr('style', 'height:' + iHeight + 'px;width:' + iWidth + 'px;float:left;');
+    }
   }
+
+  /*********************************/
+  /** Get Camera Resolution **/
+  /*******************************/
+  function fnc_GetCameraAspectRatio()
+  {
+    if (indexCheck == ResolutionToCheck.length )
+    {
+      ResolutionResult.forEach((value) => {
+
+        if (selWidth <= value.width) 
+        {
+          selWidth = value.width;
+          
+          if (selHeight < value.height) 
+          {
+            selHeight = value.height;
+          }
+
+        }
+      });
+      
+      selAspectRatio = selWidth/selHeight;
+
+      //Load camera
+      step1();
+
+      return;
+    }
+
+    const constraints = {
+      audio: true,
+      video:
+      {
+        width: { min: ResolutionToCheck[indexCheck].width},
+        height: { min: ResolutionToCheck[indexCheck].height}
+      },
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints).then(fnc_GetCameraResolution_Success).catch(fnc_GetCameraResolution_Err);
+  }
+
+  function fnc_GetCameraResolution_Success()
+  {
+    ResolutionResult.push({width: ResolutionToCheck[indexCheck].width, height: ResolutionToCheck[indexCheck].height});
+    indexCheck++;
+    fnc_GetCameraAspectRatio();
+  }
+
+  function fnc_GetCameraResolution_Err()
+  {
+    indexCheck++;
+    fnc_GetCameraAspectRatio();
+  }
+
 });
