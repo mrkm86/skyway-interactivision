@@ -263,7 +263,25 @@ $(function () {
     peer.on('open', () => {
       // Get things started
       //step1();
-      fnc_GetCameraAspectRatio();
+
+      /*
+        (1) prepare the pico.js face detector
+      */
+      //let facefinder_classify_region = function(r, c, s, pixels, ldim) {return -1.0;};
+      const cascadeurl = 'https://raw.githubusercontent.com/nenadmarkus/pico/c2e81f9d23cc11d1a612fd21e4f9de0921a5d0d9/rnt/cascades/facefinder';
+      fetch(cascadeurl).then(function(response) {
+          response.arrayBuffer().then(function(buffer) {
+              let bytes = new Int8Array(buffer);
+              facefinder_classify_region = pico.unpack_cascade(bytes);
+              console.log('* cascade loaded');
+
+              /*
+                  (4) instantiate camera handling
+              */
+             fnc_GetCameraAspectRatio();
+          })
+      })
+      
     });
 
     peer.on('error', err => {
@@ -488,7 +506,25 @@ $(function () {
         elmHTML += '>';
         elmHTML += '  <div class="group_video_child">';
         elmHTML += '    <div class="peer-mic peer-mic_' + peerId + ' item-visible"></div>';
-        elmHTML += '    <video class="remoteVideos" autoplay playsinline>';
+        elmHTML += '    <video id="remoteVideos_' + peerId + '" class="remoteVideos" autoplay playsinline/>';
+        elmHTML += '    <canvas id="from-video_' + peerId + '" class="from-video"></canvas>';
+        elmHTML += '    <input type="hidden" id="tracking_started_' + peerId + '" />';
+        elmHTML += '    <input type="hidden" id="adjustment_of_x_' + peerId + '" />';         // x座標の調整 = -15;
+        elmHTML += '    <input type="hidden" id="adjustment_of_y_' + peerId + '" />';         // y座標の調整 = -15;
+        elmHTML += '    <input type="hidden" id="adjustment_of_w_' + peerId + '" />';         // 横幅の調整  = Math.abs(adjustment_of_x * 2);
+        elmHTML += '    <input type="hidden" id="adjustment_of_h_' + peerId + '" />';         // 縦幅の調整  = Math.abs(adjustment_of_y * 2);
+        elmHTML += '    <div id="dummy-box_' + peerId + '" class="dummy-box">';
+        elmHTML += '        <div class="bar">';
+        elmHTML += '            <div class="range">';
+        elmHTML += '                <span class="range-val-wrapper">Left and right margins: <span class="range-val"></span></span>';
+        elmHTML += '                <input id="adjustment_of_x_' + peerId + '" type="range" min="0" max="60" value="15">';
+        elmHTML += '           </div>';
+        elmHTML += '            <div class="range">';
+        elmHTML += '                <span class="range-val-wrapper">Top and bottom margins: <span class="range-val"></span></span>';
+        elmHTML += '                <input id="adjustment_of_y_' + peerId + '" type="range" min="0" max="60" value="15">';
+        elmHTML += '           </div>';
+        elmHTML += '        </div>';
+        elmHTML += '    </div>';
         elmHTML += '  </div>';
         elmHTML += '</div>';
       }
@@ -498,7 +534,25 @@ $(function () {
         elmHTML += '>';
         elmHTML += '  <div class="group_video_child">';
         elmHTML += '    <div class="peer-mic peer-mic_' + peerId + ' item-visible"></div>';
-        elmHTML += '    <video class="remoteVideos" autoplay playsinline>';
+        elmHTML += '    <video id="remoteVideos_' + peerId + '" class="remoteVideos" autoplay playsinline/>';
+        elmHTML += '    <canvas id="from-video_' + peerId + '" class="from-video"></canvas>';
+        elmHTML += '    <input type="hidden" id="tracking_started_' + peerId + '" />';
+        elmHTML += '    <input type="hidden" id="adjustment_of_x_' + peerId + '" />';         // x座標の調整 = -15;
+        elmHTML += '    <input type="hidden" id="adjustment_of_y_' + peerId + '" />';         // y座標の調整 = -15;
+        elmHTML += '    <input type="hidden" id="adjustment_of_w_' + peerId + '" />';         // 横幅の調整  = Math.abs(adjustment_of_x * 2);
+        elmHTML += '    <input type="hidden" id="adjustment_of_h_' + peerId + '" />';         // 縦幅の調整  = Math.abs(adjustment_of_y * 2);
+        elmHTML += '    <div id="dummy-box_' + peerId + '" class="dummy-box">';
+        elmHTML += '        <div class="bar">';
+        elmHTML += '            <div class="range">';
+        elmHTML += '                <span class="range-val-wrapper">Left and right margins: <span class="range-val"></span></span>';
+        elmHTML += '                <input id="adjustment_of_x_' + peerId + '" type="range" min="0" max="60" value="15">';
+        elmHTML += '           </div>';
+        elmHTML += '            <div class="range">';
+        elmHTML += '                <span class="range-val-wrapper">Top and bottom margins: <span class="range-val"></span></span>';
+        elmHTML += '                <input id="adjustment_of_y_' + peerId + '" type="range" min="0" max="60" value="15">';
+        elmHTML += '           </div>';
+        elmHTML += '        </div>';
+        elmHTML += '    </div>';
         elmHTML += '  </div>';
         elmHTML += '</div>';
       }
@@ -524,6 +578,17 @@ $(function () {
 
       //Send Mic status to remote peer
       sendAudioSignal();
+
+      var video     = document.getElementById('remoteVideos_' + peerId);
+      video.width   = selWidth;
+      video.height  = selHeight;
+
+      var video_canvas    = document.getElementById('from-video_' + peerId);
+      video_canvas.width  = selWidth;
+      video_canvas.height = selHeight;
+
+      //Start face detect
+      PICO_FACE.init_face_margin(peerId);
     });
 
     //Recieve data from remote peer.
