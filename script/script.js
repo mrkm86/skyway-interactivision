@@ -509,22 +509,6 @@ $(function () {
         elmHTML += '    <video id="remoteVideos_' + peerId + '" class="remoteVideos" autoplay playsinline/>';
         elmHTML += '    <canvas id="from-video_' + peerId + '" class="from-video"></canvas>';
         elmHTML += '    <input type="hidden" id="tracking_started_' + peerId + '" />';
-        elmHTML += '    <input type="hidden" id="adjustment_of_x_' + peerId + '" />';         // x座標の調整 = -15;
-        elmHTML += '    <input type="hidden" id="adjustment_of_y_' + peerId + '" />';         // y座標の調整 = -15;
-        elmHTML += '    <input type="hidden" id="adjustment_of_w_' + peerId + '" />';         // 横幅の調整  = Math.abs(adjustment_of_x * 2);
-        elmHTML += '    <input type="hidden" id="adjustment_of_h_' + peerId + '" />';         // 縦幅の調整  = Math.abs(adjustment_of_y * 2);
-        elmHTML += '    <div id="dummy-box_' + peerId + '" class="dummy-box">';
-        elmHTML += '        <div class="bar">';
-        elmHTML += '            <div class="range">';
-        elmHTML += '                <span class="range-val-wrapper">Left and right margins: <span class="range-val"></span></span>';
-        elmHTML += '                <input id="adjustment_of_x_' + peerId + '" type="range" min="0" max="60" value="15">';
-        elmHTML += '           </div>';
-        elmHTML += '            <div class="range">';
-        elmHTML += '                <span class="range-val-wrapper">Top and bottom margins: <span class="range-val"></span></span>';
-        elmHTML += '                <input id="adjustment_of_y_' + peerId + '" type="range" min="0" max="60" value="15">';
-        elmHTML += '           </div>';
-        elmHTML += '        </div>';
-        elmHTML += '    </div>';
         elmHTML += '  </div>';
         elmHTML += '</div>';
       }
@@ -537,22 +521,6 @@ $(function () {
         elmHTML += '    <video id="remoteVideos_' + peerId + '" class="remoteVideos" autoplay playsinline/>';
         elmHTML += '    <canvas id="from-video_' + peerId + '" class="from-video"></canvas>';
         elmHTML += '    <input type="hidden" id="tracking_started_' + peerId + '" />';
-        elmHTML += '    <input type="hidden" id="adjustment_of_x_' + peerId + '" />';         // x座標の調整 = -15;
-        elmHTML += '    <input type="hidden" id="adjustment_of_y_' + peerId + '" />';         // y座標の調整 = -15;
-        elmHTML += '    <input type="hidden" id="adjustment_of_w_' + peerId + '" />';         // 横幅の調整  = Math.abs(adjustment_of_x * 2);
-        elmHTML += '    <input type="hidden" id="adjustment_of_h_' + peerId + '" />';         // 縦幅の調整  = Math.abs(adjustment_of_y * 2);
-        elmHTML += '    <div id="dummy-box_' + peerId + '" class="dummy-box">';
-        elmHTML += '        <div class="bar">';
-        elmHTML += '            <div class="range">';
-        elmHTML += '                <span class="range-val-wrapper">Left and right margins: <span class="range-val"></span></span>';
-        elmHTML += '                <input id="adjustment_of_x_' + peerId + '" type="range" min="0" max="60" value="15">';
-        elmHTML += '           </div>';
-        elmHTML += '            <div class="range">';
-        elmHTML += '                <span class="range-val-wrapper">Top and bottom margins: <span class="range-val"></span></span>';
-        elmHTML += '                <input id="adjustment_of_y_' + peerId + '" type="range" min="0" max="60" value="15">';
-        elmHTML += '           </div>';
-        elmHTML += '        </div>';
-        elmHTML += '    </div>';
         elmHTML += '  </div>';
         elmHTML += '</div>';
       }
@@ -588,7 +556,7 @@ $(function () {
       video_canvas.height = selHeight;
 
       //Start face detect
-      PICO_FACE.init_face_margin(peerId);
+      PICO_FACE.initFaceMargin(peerId);
     });
 
     //Recieve data from remote peer.
