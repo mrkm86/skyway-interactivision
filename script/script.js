@@ -106,6 +106,16 @@ $(function () {
       $('#model-setting-page').css('display', 'none');
     });
 
+    //顔認証表示
+    $('#allowFaceDetect').change(function(){
+        if($(this).is(':checked')) {
+          $('.remoteVideos').each(function(){
+            var id = $(this).attr('id').split('_')[1];
+            PICO_FACE.drawLoop(id);
+          });
+        }
+    });
+
     //Turn On/Off Video
     $('#button-video').click(function () {
       OnOffVideo(!localVideoTrack.enabled);

@@ -122,7 +122,17 @@ PICO_FACE = {
             let dt = Date.now() - last;
             PICO_FACE.processfn(peerId);
             last = Date.now();
-            requestAnimationFrame(loop);
+
+            if ($('#allowFaceDetect').is(':checked'))
+            {
+                $('.from-video').removeClass('item-visible');
+                $('.remoteVideos').addClass('item-visible');
+                requestAnimationFrame(loop);
+            }
+            else {
+                $('.from-video').addClass('item-visible');
+                $('.remoteVideos').removeClass('item-visible');
+            }
         };
 
         loop();
