@@ -114,6 +114,11 @@ $(function () {
             FACE_API.drawLoop(id);
           });
         }
+        else{
+          if (!$('.from-video').hasClass('item-visible')) {
+            $('.from-video').addClass('item-visible');
+          }
+        }
     });
 
     //Turn On/Off Video

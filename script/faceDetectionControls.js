@@ -37,7 +37,7 @@ FACE_API = {
       // variable (expressed in milliseconds)
       // (see https://github.com/cbrandolino/camvas)
       let dt = Date.now() - last;
-      FACE_API.processfn(peerId);
+      await FACE_API.processfn(peerId);
       last = Date.now();
 
       if ($('#allowFaceDetect').is(':checked')) {
