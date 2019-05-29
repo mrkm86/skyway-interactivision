@@ -111,8 +111,13 @@ $(function () {
         if($(this).is(':checked')) {
           $('.remoteVideos').each(function(){
             var id = $(this).attr('id').split('_')[1];
-            PICO_FACE.drawLoop(id);
+            FACE_API.drawLoop(id);
           });
+        }
+        else{
+          if (!$('.from-video').hasClass('item-visible')) {
+            $('.from-video').addClass('item-visible');
+          }
         }
     });
 
@@ -271,27 +276,7 @@ $(function () {
     callStatus(STATUS_HANGUP);
 
     peer.on('open', () => {
-      // Get things started
-      //step1();
-
-      /*
-        (1) prepare the pico.js face detector
-      */
-      //let facefinder_classify_region = function(r, c, s, pixels, ldim) {return -1.0;};
-      const cascadeurl = 'https://raw.githubusercontent.com/nenadmarkus/pico/c2e81f9d23cc11d1a612fd21e4f9de0921a5d0d9/rnt/cascades/facefinder';
-      fetch(cascadeurl).then(function(response) {
-          response.arrayBuffer().then(function(buffer) {
-              let bytes = new Int8Array(buffer);
-              facefinder_classify_region = pico.unpack_cascade(bytes);
-              console.log('* cascade loaded');
-
-              /*
-                  (4) instantiate camera handling
-              */
-             fnc_GetCameraAspectRatio();
-          })
-      })
-      
+      fnc_GetCameraAspectRatio();
     });
 
     peer.on('error', err => {
@@ -566,7 +551,7 @@ $(function () {
       video_canvas.height = selHeight;
 
       //Start face detect
-      PICO_FACE.initFaceMargin(peerId);
+      FACE_API.initFaceMargin(peerId);
     });
 
     //Recieve data from remote peer.
