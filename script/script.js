@@ -232,6 +232,8 @@ $(function () {
       return;
     }
 
+    fnc_LogWrite('info', 'TRY TO JOIN');
+
     room = peer.joinRoom('mesh_video_' + window.__SKYWAY_ROOM__, { stream: localStream });
 
     //Set call status
@@ -239,16 +241,22 @@ $(function () {
     //Turn on video
     OnOffVideo(true);
 
+    fnc_LogWrite('info', 'TRY TO JOIN');
+
     //Microphone devices is mute
+    fnc_LogWrite('info', 'Microphone devices is mute');
     if (localAudioTrack.muted) {
+      fnc_LogWrite('info', 'localAudioTrack.muted');
       OnOffMicrophone(false);
     }
     else {
       //Turn On/Off Microphone
+      fnc_LogWrite('info', 'Turn On/Off Microphone');
       OnOffMicrophone(!INITIALIZE_MUTE);
     }
 
     //Display video
+    fnc_LogWrite('info', 'Display video');
     step3(room);
   }
 
