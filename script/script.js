@@ -173,6 +173,9 @@ $(function () {
   }
 
   function OnOffMicrophone(isOn) {
+
+    fnc_LogWrite('info', 'OnOffMicrophone is started.');
+
     var ctrl = $('#button-microphone');
     localAudioTrack.enabled = isOn;
 
@@ -196,6 +199,8 @@ $(function () {
         sendAudioSignal();
       }
     }, 1000);
+
+    fnc_LogWrite('info', 'OnOffMicrophone is completed.');
   }
 
   /****************************/
@@ -227,12 +232,13 @@ $(function () {
   /** Join Conference *********/
   /****************************/
   function joinConference() {
+
+    fnc_LogWrite('info', 'joinConference is started.');
+
     // Initiate a call!
     if (!window.__SKYWAY_ROOM__) {
       return;
     }
-
-    fnc_LogWrite('info', 'TRY TO JOIN');
 
     room = peer.joinRoom('mesh_video_' + window.__SKYWAY_ROOM__, { stream: localStream });
 
@@ -241,23 +247,20 @@ $(function () {
     //Turn on video
     OnOffVideo(true);
 
-    fnc_LogWrite('info', 'TRY TO JOIN');
-
     //Microphone devices is mute
-    fnc_LogWrite('info', 'Microphone devices is mute');
     if (localAudioTrack.muted) {
-      fnc_LogWrite('info', 'localAudioTrack.muted');
       OnOffMicrophone(false);
     }
     else {
       //Turn On/Off Microphone
-      fnc_LogWrite('info', 'Turn On/Off Microphone');
       OnOffMicrophone(!INITIALIZE_MUTE);
     }
 
     //Display video
-    fnc_LogWrite('info', 'Display video');
     step3(room);
+
+    fnc_LogWrite('info', 'joinConference is completed.');
+
   }
 
   /****************************/
@@ -344,6 +347,8 @@ $(function () {
   /********************************/
   function sendAudioSignal() {
 
+    fnc_LogWrite('info', 'sendAudioSignal is started.');
+
     //Check First Join.
     if ($('.peer-mic-on').length == 0 && $('.peer-mic-off').length == 0) {
       isResend = true;
@@ -360,6 +365,8 @@ $(function () {
     }
 
     room.send(dataSend);
+
+    fnc_LogWrite('info', 'sendAudioSignal is completed.');
   }
 
   /**********************************/
@@ -465,6 +472,9 @@ $(function () {
   /** Display video ***********/
   /****************************/
   function step3(room) {
+
+    fnc_LogWrite('info', 'step3 is started.');
+
     // Wait for stream on the call, then set peer video display
     room.on('stream', stream => {
       const peerId = stream.peerId;
@@ -576,7 +586,10 @@ $(function () {
       //Maximize self camera
       maximizeCamera();
     });
-  }
+  
+    fnc_LogWrite('info', 'step3 is completed.');
+
+}
 
   /****************************/
   /** Show/Hide Function bar **/
