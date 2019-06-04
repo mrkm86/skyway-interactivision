@@ -728,16 +728,17 @@ $(function () {
 
     var dataSend =
     {
-      "time": year + "/" + month + "/" + date + " " + hour + ":" + minute + ":" + second,
-      "user": window.location.pathname,
-      "level": strLevel,
-      "message": strMessage
+      time: year + "/" + month + "/" + date + " " + hour + ":" + minute + ":" + second,
+      user: window.location.pathname,
+      level: strLevel,
+      message: strMessage
     }
 
     $.ajax({
       type: 'POST',
       url: WEBHOOK,
-      data: dataSend,
+      data: JSON.stringify(dataSend),
+      contentType: "application/json; charset=utf-8",
       success: function (data) {
         console.log("====>Success:" + JSON.stringify(data));
       },
