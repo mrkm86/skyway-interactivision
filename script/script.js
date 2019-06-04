@@ -40,8 +40,8 @@ $(function () {
   for (indexCheck = 2; indexCheck < 230; indexCheck++) {
     var number = 50;
     ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: 1920 + (number * indexCheck) });
-    ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: (1920 + (number * indexCheck)) / (16/9) });
-    ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: (1920 + (number * indexCheck)) / (4/3) });
+    ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: (1920 + (number * indexCheck)) / (16 / 9) });
+    ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: (1920 + (number * indexCheck)) / (4 / 3) });
   }
 
   //Reset idnex check
@@ -366,18 +366,17 @@ $(function () {
     const constraints = {
       audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
       video: {
-          width: {exact: selWidth}, 
-          height: {exact: selHeight},
-          frameRate: 30,
-          deviceId: videoSource ? { exact: videoSource } : undefined
-        }
+        width: { exact: selWidth },
+        height: { exact: selHeight },
+        frameRate: 30,
+        deviceId: videoSource ? { exact: videoSource } : undefined
+      }
     };
 
     //stop stream
     if (localStream) {
-      for (let track of localStream.getTracks()) 
-      { 
-          track.stop();
+      for (let track of localStream.getTracks()) {
+        track.stop();
       }
     }
 
@@ -678,8 +677,8 @@ $(function () {
       audio: true,
       video:
       {
-        width: {exact: ResolutionToCheck[indexCheck].width },
-        height: {exact: ResolutionToCheck[indexCheck].height },
+        width: { exact: ResolutionToCheck[indexCheck].width },
+        height: { exact: ResolutionToCheck[indexCheck].height },
         frameRate: 30,
         deviceId: videoSource ? { exact: videoSource } : undefined
       },
@@ -694,17 +693,52 @@ $(function () {
     indexCheck++;
 
     //stop stream
-    for (let track of stream.getTracks()) 
-    { 
-        track.stop();
+    for (let track of stream.getTracks()) {
+      track.stop();
     }
-    
+
     fnc_GetCameraAspectRatio();
   }
 
   function fnc_GetCameraResolution_Err() {
     indexCheck++;
     fnc_GetCameraAspectRatio();
+  }
+
+  /*********************************/
+  /** Write Log Function         **/
+  /*******************************/
+  function fnc_LogWrite(strLevel, strMessage) {
+
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = ("0" + (now.getMonth() + 1)).slice(-2);
+    var date = ("0" + now.getDate()).slice(-2);
+    var hour = ("0" + now.getHours()).slice(-2);
+    var minute = ("0" + now.getMinutes()).slice(-2);
+    var second = ("0" + now.getSeconds()).slice(-2);
+
+    var dataSend =
+    {
+      "time": year + "/" + month + "/" + date + " " + hour + ":" + minute + ":" + second,
+      "user": window.location.pathname,
+      "level": strLevel,
+      "message": strMessage
+    }
+
+    $.ajax({
+      type: 'POST',
+      url: WEBHOOK,
+      data: dataSend,
+      success: function (data) {
+        console.log("====>Success:" + JSON.stringify(data));
+      },
+
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert(errorThrown);
+        console.log(errorThrown);
+      }
+    });
   }
 
 });
