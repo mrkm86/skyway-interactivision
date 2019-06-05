@@ -147,6 +147,8 @@ $(function () {
         window.close();
       }
       else if ($(this).hasClass('button-retry')) {
+
+        fnc_LogWrite('info', 'fnc_GetCameraAspectRatio is started.');
         //step1();
         fnc_GetCameraAspectRatio();
       }
@@ -159,6 +161,8 @@ $(function () {
   }
 
   function OnOffVideo(isOn) {
+
+    fnc_LogWrite('info', 'OnOffVideo is started.');
     var ctrl = $('#button-video');
     localVideoTrack.enabled = isOn;
 
@@ -170,6 +174,7 @@ $(function () {
       ctrl.removeClass('button-video-on');
       ctrl.addClass('button-video-off');
     }
+    fnc_LogWrite('info', 'OnOffVideo is completed.');
   }
 
   function OnOffMicrophone(isOn) {
@@ -268,12 +273,14 @@ $(function () {
   /****************************/
   function initSkyway() {
 
+    fnc_LogWrite('info', 'initSkyway is started.');
     //Set call status
     callStatus(STATUS_HANGUP);
 
     peer.on('open', () => {
       // Get things started
       //step1();
+      fnc_LogWrite('info', 'fnc_GetCameraAspectRatio is started.');
       fnc_GetCameraAspectRatio();
     });
 
@@ -340,6 +347,8 @@ $(function () {
     navigator.mediaDevices.ondevicechange = function (event) {
       //step1();
     }
+
+    fnc_LogWrite('info', 'initSkyway is completed.');
   }
 
   /**********************************/
@@ -373,6 +382,9 @@ $(function () {
   /** Get Devices and Video Stream */
   /********************************/
   function step1() {
+
+    fnc_LogWrite('info', 'step1 is started.');
+
     // Get audio/video stream
     const audioSource = $('#audioSource').val();
     const videoSource = $('#videoSource').val();
@@ -393,6 +405,18 @@ $(function () {
       for (let track of localStream.getTracks()) {
         track.stop();
       }
+    }
+
+    if (videoSource == null) {
+      callStatus(STATUS_RETRY);
+       fnc_LogWrite('error', 'video device is not found.');
+      return;
+    }
+
+    if (audioSource == null) {
+      callStatus(STATUS_RETRY);
+      fnc_LogWrite('error', 'audio device is not found.');
+      return;
     }
 
     //Get video stream for self video
@@ -429,6 +453,8 @@ $(function () {
       callStatus(STATUS_RETRY);
       console.error(err);
     });
+
+    fnc_LogWrite('info', 'step1 is completed.');
   }
 
   /****************************************/
@@ -689,7 +715,7 @@ $(function () {
 
       //Load camera
       step1();
-
+      fnc_LogWrite('info', 'fnc_GetCameraAspectRatio is completed.');
       return;
     }
 
@@ -738,10 +764,11 @@ $(function () {
     var hour = ("0" + now.getHours()).slice(-2);
     var minute = ("0" + now.getMinutes()).slice(-2);
     var second = ("0" + now.getSeconds()).slice(-2);
+    var milisecond = ("00" + now.getMilliseconds()).slice(-3);
 
     var dataSend =
     {
-      time: year + "/" + month + "/" + date + " " + hour + ":" + minute + ":" + second,
+      time: year + "" + month + "" + date + " " + hour + ":" + minute + ":" + second + "." + milisecond,
       user: window.location.pathname,
       level: strLevel,
       message: strMessage
