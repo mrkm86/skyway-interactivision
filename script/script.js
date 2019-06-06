@@ -265,7 +265,7 @@ $(function () {
     step3(room);
 
     fnc_LogWrite('info', 'joinConference is completed.');
-
+    fnc_LogWrite('info', 'boot operation is completed.');
   }
 
   /****************************/
@@ -273,6 +273,7 @@ $(function () {
   /****************************/
   function initSkyway() {
 
+    fnc_LogWrite('info', 'boot operation is started.');
     fnc_LogWrite('info', 'initSkyway is started.');
     //Set call status
     callStatus(STATUS_HANGUP);
@@ -409,7 +410,7 @@ $(function () {
 
     if (videoSource == null) {
       callStatus(STATUS_RETRY);
-       fnc_LogWrite('error', 'video device is not found.');
+      fnc_LogWrite('error', 'video device is not found.');
       return;
     }
 
