@@ -13,6 +13,8 @@ $(function () {
   var selAspectRatio = 16 / 9;
   var peerWidth = 640;
   var peerHeight = 360;
+  var clsPositionSelf = "bottom-right";
+  var paramsURL = {};
 
   var iXScale = 0;
   var iYScale = 0;
@@ -134,6 +136,7 @@ $(function () {
         //Maximize Self Camera
         if ($('.remoteVideos').length == 0) {
           $('#wrapp-video').removeClass('my-video-multi');
+          $('#wrapp-video').removeClass(clsPositionSelf);
           $('#wrapp-video').addClass('my-video-single');
           $('#self-mic').addClass('item-visible');
 
@@ -258,7 +261,7 @@ $(function () {
     }
     else {
       //Turn On/Off Microphone
-      OnOffMicrophone(!INITIALIZE_MUTE);
+      OnOffMicrophone(!paramsURL["mute"]);
     }
 
     //Display video
@@ -275,6 +278,25 @@ $(function () {
 
     fnc_LogWrite('info', 'boot operation is started.');
     fnc_LogWrite('info', 'initSkyway is started.');
+
+    //Get parameter from url
+    paramsURL = getUrlParams();
+
+    if (paramsURL["mute"] == null || paramsURL["mute"] == undefined) {
+      paramsURL["mute"] = true;
+    }
+
+    if (paramsURL["position"] == null || paramsURL["mute"] == undefined) {
+      paramsURL["position"] = "right";
+    }
+
+    if (paramsURL["position"] == "right") {
+      clsPositionSelf = "bottom-right";
+    }
+    else {
+      clsPositionSelf = "bottom-left";
+    }
+
     //Set call status
     callStatus(STATUS_HANGUP);
 
@@ -482,6 +504,7 @@ $(function () {
       $('#seft-video').css('max-height', $('body').height() + 'px');
 
       $('#wrapp-video').removeClass('my-video-multi');
+      $('#wrapp-video').removeClass(clsPositionSelf);
       $('#wrapp-video').addClass('my-video-single');
       $('#self-mic').addClass('item-visible');
 
@@ -517,6 +540,7 @@ $(function () {
       if ($('#wrapp-video').hasClass("my-video-single")) {
         $('#wrapp-video').removeClass('my-video-single');
         $('#wrapp-video').addClass('my-video-multi');
+        $('#wrapp-video').addClass(clsPositionSelf);
 
         //Trun on MicOff status
         if (!localAudioTrack.enabled) {
@@ -789,6 +813,20 @@ $(function () {
         console.log(errorThrown);
       }
     });
+  }
+
+  /*********************************/
+  /** Get parameters from URL    **/
+  /*******************************/
+  function getUrlParams() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,    
+                                            function(m, key, value) {
+                                              if (value == "false") vars[key] = false;
+                                              else if (value == "true") vars[key] = true;
+                                              else vars[key] = value;
+                                            });
+    return vars;
   }
 
 });

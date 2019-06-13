@@ -112,8 +112,17 @@ Copyright (c) Nicolas Gallagher and Jonathan Neal
   height: 110px !important;
   object-fit: unset;
   position: absolute;
+  /* bottom: 10;
+  right: 10; */
+}
+.bottom-right {
   bottom: 10;
   right: 10;
+}
+
+.bottom-left {
+  bottom: 10;
+  left: 10;
 }
 
 .group_video_child {
