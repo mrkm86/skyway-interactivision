@@ -19,35 +19,8 @@ $(function () {
   var iXScale = 0;
   var iYScale = 0;
 
-  var ResolutionToCheck = [
-    { width: 320, height: 320 },    //1:1
-    { width: 320, height: 180 },    //16:9
-    { width: 320, height: 240 },    //4:3
-    { width: 640, height: 640 },
-    { width: 640, height: 360 },
-    { width: 640, height: 480 },
-    { width: 1280, height: 1280 },
-    { width: 1280, height: 720 },
-    { width: 1280, height: 960 },
-    { width: 1920, height: 1920 },
-    { width: 1920, height: 1080 },
-    { width: 1920, height: 1440 }
-  ];
-
-  var ResolutionResult = [];
-  var selWidth = 320;
-  var selHeight = 240;
-  var indexCheck = 0;
-
-  for (indexCheck = 2; indexCheck < 230; indexCheck++) {
-    var number = 50;
-    ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: 1920 + (number * indexCheck) });
-    ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: (1920 + (number * indexCheck)) / (16 / 9) });
-    ResolutionToCheck.push({ width: 1920 + (number * indexCheck), height: (1920 + (number * indexCheck)) / (4 / 3) });
-  }
-
-  //Reset idnex check
-  indexCheck = 0;
+  var selWidth = VIDEO_WIDTH;
+  var selHeight = VIDEO_HEIGHT;
 
   //Set title
   document.title = window.__SKYWAY_ROOM__;
@@ -150,10 +123,7 @@ $(function () {
         window.close();
       }
       else if ($(this).hasClass('button-retry')) {
-
-        fnc_LogWrite('info', 'fnc_GetCameraAspectRatio is started.');
-        //step1();
-        fnc_GetCameraAspectRatio();
+        step1();
       }
       //hangup or retry 
       else {
@@ -302,9 +272,7 @@ $(function () {
 
     peer.on('open', () => {
       // Get things started
-      //step1();
-      fnc_LogWrite('info', 'fnc_GetCameraAspectRatio is started.');
-      fnc_GetCameraAspectRatio();
+      step1();
     });
 
     peer.on('error', err => {
@@ -361,9 +329,9 @@ $(function () {
           }
         });
 
-        videoSelect.on('change', fnc_GetCameraAspectRatio);
-        audioSelect.on('change', fnc_GetCameraAspectRatio);
-        speakerSelect.on('change', fnc_GetCameraAspectRatio);
+        videoSelect.on('change', step1);
+        audioSelect.on('change', step1);
+        speakerSelect.on('change', step1);
       });
 
     //Reset devices when Change or Disabled devices.
@@ -416,8 +384,8 @@ $(function () {
     const constraints = {
       audio: { deviceId: audioSource ? { exact: audioSource } : undefined },
       video: {
-        width: { exact: selWidth },
-        height: { exact: selHeight },
+        width: { ideal: selWidth },
+        height: { ideal: selHeight },
         frameRate: 30,
         deviceId: videoSource ? { exact: videoSource } : undefined
       }
@@ -448,7 +416,7 @@ $(function () {
       localStream = stream;
       localAudioTrack = localStream.getAudioTracks()[0];
       localVideoTrack = localStream.getVideoTracks()[0];
-
+      
       //Mute Microphone Event
       localAudioTrack.onmute = function (event) {
         localAudioTrack.enabled = false;
@@ -712,69 +680,6 @@ $(function () {
 
       $('.group_video').attr('style', 'height:' + iHeight + 'px;width:' + iWidth + 'px;float:left;');
     }
-  }
-
-  /*********************************/
-  /** Get Camera Resolution **/
-  /*******************************/
-  function fnc_GetCameraAspectRatio() {
-
-    const videoSource = $('#videoSource').val();
-
-    if (indexCheck == ResolutionToCheck.length) {
-      ResolutionResult.forEach((value) => {
-
-        if (selWidth < value.width) {
-          selWidth = value.width;
-          selHeight = value.height;
-        }
-        else if (selWidth == value.width && selHeight < value.height) {
-          selHeight = value.height;
-        }
-
-      });
-
-      selAspectRatio = selWidth / selHeight;
-      indexCheck = 0;
-      ResolutionResult = [];
-
-      //Load camera
-      step1();
-      fnc_LogWrite('info', 'fnc_GetCameraAspectRatio is completed.');
-      return;
-    }
-
-    // [exact] -> Get the best resolution from any device (Resolution > 640x480)
-    const constraints = {
-      audio: true,
-      video:
-      {
-        width: { exact: ResolutionToCheck[indexCheck].width },
-        height: { exact: ResolutionToCheck[indexCheck].height },
-        frameRate: 30,
-        deviceId: videoSource ? { exact: videoSource } : undefined
-      },
-    };
-
-    navigator.mediaDevices.getUserMedia(constraints).then(fnc_GetCameraResolution_Success).catch(fnc_GetCameraResolution_Err);
-  }
-
-  function fnc_GetCameraResolution_Success(stream) {
-
-    ResolutionResult.push({ width: ResolutionToCheck[indexCheck].width, height: ResolutionToCheck[indexCheck].height });
-    indexCheck++;
-
-    //stop stream
-    for (let track of stream.getTracks()) {
-      track.stop();
-    }
-
-    fnc_GetCameraAspectRatio();
-  }
-
-  function fnc_GetCameraResolution_Err() {
-    indexCheck++;
-    fnc_GetCameraAspectRatio();
   }
 
   /*********************************/
