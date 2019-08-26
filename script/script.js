@@ -19,8 +19,16 @@ $(function () {
   var iXScale = 0;
   var iYScale = 0;
 
-  var selWidth = VIDEO_WIDTH;
-  var selHeight = VIDEO_HEIGHT;
+  var selWidth = 1920;
+  var selHeight = 1080;
+
+  if (!isNaN(window.VIDEO_WIDTH)) {
+    selWidth = VIDEO_WIDTH;
+  }
+
+  if (!isNaN(window.VIDEO_HEIGHT)) {
+    selHeight = VIDEO_HEIGHT;
+  }
 
   //Set title
   document.title = window.__SKYWAY_ROOM__;
