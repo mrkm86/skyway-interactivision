@@ -385,7 +385,7 @@ $(function () {
   function step1() {
 
     fnc_LogWrite('info', 'step1 is started.');
-    
+
     // Get audio/video stream
     const audioSource = $('#audioSource').val();
     const videoSource = $('#videoSource').val();
@@ -572,23 +572,23 @@ $(function () {
       sendAudioSignal();
 
       const options = {
-        interval: 2000,
+        interval: 1000,
         thresholds: {
           "video-fractionLost": {
             unstable: 0.08,
-            critical: 0.15
+            critical: 60
           },
           "video-jitter": {
             unstable: 0.20,
-            critical: 0.50
+            critical: 60
           },
           "video-jitterBufferDelay": {
             unstable: 0.20,
-            critical: 0.50
+            critical: 60
           },
           "video-rtt": {
             unstable: 0.20,
-            critical: 0.50
+            critical: 60
           }
         },
         triggerCondition: {
