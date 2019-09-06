@@ -574,19 +574,19 @@ $(function () {
       const options = {
         interval: 1000,
         thresholds: {
-          "video-fractionLost": {
-            unstable: 0.15,
+          "video-fractionLost": { //Percent
+            unstable: 0.15,       
             critical: 0.30
           },
-          "video-jitter": {
+          "video-jitter": {   //Second
             unstable: 0.20,
             critical: 60
           },
-          "video-jitterBufferDelay": {
+          "video-jitterBufferDelay": {  //Second
             unstable: 0.20,
             critical: 60
           },
-          "video-rtt": {
+          "video-rtt": {  //Second
             unstable: 0.20,
             critical: 60
           }
