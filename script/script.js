@@ -1,6 +1,8 @@
 /* eslint-disable require-jsdoc */
 $(function () {
 
+  const RTCStatsInsight = window.RTCStatsWrapper.RTCStatsInsight;
+  const RTCStatsInsightEvents = window.RTCStatsWrapper.RTCStatsInsightEvents;
   let localStream;
   let room;
   var localAudioTrack;
@@ -383,7 +385,7 @@ $(function () {
   function step1() {
 
     fnc_LogWrite('info', 'step1 is started.');
-
+    
     // Get audio/video stream
     const audioSource = $('#audioSource').val();
     const videoSource = $('#videoSource').val();
@@ -568,6 +570,76 @@ $(function () {
 
       //Send Mic status to remote peer
       sendAudioSignal();
+
+      const options = {
+        interval: 2000,
+        thresholds: {
+          "video-fractionLost": {
+            unstable: 0.08,
+            critical: 0.15
+          },
+          "video-jitter": {
+            unstable: 0.20,
+            critical: 0.50
+          },
+          "video-jitterBufferDelay": {
+            unstable: 0.20,
+            critical: 0.50
+          },
+          "video-rtt": {
+            unstable: 0.20,
+            critical: 0.50
+          }
+        },
+        triggerCondition: {
+          failCount: 1,
+          within: 3
+        }
+      }
+
+      for (var key in room.connections) {
+
+        var pc = room.connections[key][0].getPeerConnection();
+        
+        if (pc == null) continue;
+
+        var insight = new RTCStatsInsight(pc, options);
+        var idTest = room.connections[key][0].remoteId;
+        
+        insight.on(RTCStatsInsightEvents["video-fractionLost"].key, event => {
+          if  (event.level === 'critical') {
+            fnc_LogWrite('info', '[video-fractionLost] Resart is Started.');
+            step1();
+            fnc_LogWrite('info', '[video-fractionLost] Resart is completed.');
+          }
+        });
+
+        insight.on(RTCStatsInsightEvents["video-jitter"].key, event => {
+          if  (event.level === 'critical') {
+            fnc_LogWrite('info', '[video-jitter] Resart is Started.');
+            step1();
+            fnc_LogWrite('info', '[video-jitter] Resart is completed.');
+          }
+        });
+
+        insight.on(RTCStatsInsightEvents["video-jitterBufferDelay"].key, event => {
+          if  (event.level === 'critical') {
+            fnc_LogWrite('info', '[video-jitterBufferDelay] Resart is Started.');
+            step1();
+            fnc_LogWrite('info', '[video-jitterBufferDelay] Resart is completed.');
+          }
+        });
+
+        insight.on(RTCStatsInsightEvents["video-rtt"].key, event => {
+          if  (event.level === 'critical') {
+            fnc_LogWrite('info', '[video-rtt] Resart is Started.');
+            step1();
+            fnc_LogWrite('info', '[video-rtt] Resart is completed.');
+          }
+        });
+
+        insight.watch();
+      }
     });
 
     //Recieve data from remote peer.
