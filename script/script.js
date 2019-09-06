@@ -575,8 +575,8 @@ $(function () {
         interval: 1000,
         thresholds: {
           "video-fractionLost": {
-            unstable: 0.08,
-            critical: 60
+            unstable: 0.15,
+            critical: 0.30
           },
           "video-jitter": {
             unstable: 0.20,
