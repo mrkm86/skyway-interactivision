@@ -346,7 +346,28 @@ $(function () {
 
     //Reset devices when Change or Disabled devices.
     navigator.mediaDevices.ondevicechange = function (event) {
-      //step1();
+
+      //Check Vieo is not found
+      navigator.mediaDevices.enumerateDevices()
+        .then(deviceInfos => {
+
+          var iVideoFlg = 0;
+          for (let i = 0; i !== deviceInfos.length; ++i) {
+            const deviceInfo = deviceInfos[i];
+            if  (deviceInfo == null) continue;
+
+            if (deviceInfo.kind === 'videoinput') {
+              iVideoFlg++;
+            }
+          }
+
+          if (iVideoFlg == 0) {
+            fnc_LogWrite('error', 'video device is not found. Page is Reload.');
+            window.location.reload();
+            return;
+          }
+        
+      });
     }
 
     fnc_LogWrite('info', 'initSkyway is completed.');
@@ -797,6 +818,7 @@ $(function () {
         alert(errorThrown);
         console.log(errorThrown);
       }
+      
     });
   }
 
