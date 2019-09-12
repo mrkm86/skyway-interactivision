@@ -432,6 +432,7 @@ $(function () {
     if (videoSource == null) {
       callStatus(STATUS_RETRY);
       fnc_LogWrite('error', 'video device is not found.');
+      window.location.reload();
       return;
     }
 
