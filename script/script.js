@@ -17,6 +17,7 @@ $(function () {
   var peerHeight = 360;
   var clsPositionSelf = "bottom-right";
   var paramsURL = {};
+  var iDeivcesCnt = 0;//ANHLD_TEMP
 
   var iXScale = 0;
   var iYScale = 0;
@@ -222,6 +223,7 @@ $(function () {
   function joinConference() {
 
     fnc_LogWrite('info', 'joinConference is started.');
+    fnc_LogWrite('Test', '[joinConference]_[' + localStream.id + ']');  //ANHLD_TEMP
 
     // Initiate a call!
     if (!window.__SKYWAY_ROOM__) {
@@ -300,6 +302,8 @@ $(function () {
     const speakerSelect = $('#speakerSource');
     const selectors = [audioSelect, videoSelect, speakerSelect];
 
+    iDeivcesCnt = 0; //ANHLD_TEMP
+    fnc_LogWrite('Test', '[initSkyway]_navigator.mediaDevices.enumerateDevices()');  //ANHLD_TEMP
     navigator.mediaDevices.enumerateDevices()
       .then(deviceInfos => {
         const values = selectors.map(select => select.val() || '');
@@ -310,6 +314,7 @@ $(function () {
           }
         });
 
+        fnc_LogWrite('Test', '[initSkyway]_Devices Length:' + deviceInfos.length);  //ANHLD_TEMP
         for (let i = 0; i !== deviceInfos.length; ++i) {
           const deviceInfo = deviceInfos[i];
           const option = $('<option>').val(deviceInfo.deviceId);
@@ -323,6 +328,8 @@ $(function () {
             option.text(deviceInfo.label ||
               'Camera ' + (videoSelect.children().length + 1));
             videoSelect.append(option);
+            iDeivcesCnt++; //ANHLD_TEMP
+            fnc_LogWrite('Test', '[initSkyway]_Camera Devices:' + deviceInfo.label);  //ANHLD_TEMP
           }
           else if (deviceInfo.kind === 'audiooutput') {
             option.text(deviceInfo.label ||
@@ -367,6 +374,8 @@ $(function () {
             return;
           }
         
+          iDeivcesCnt = iVideoFlg; //ANHLD_TEMP
+          fnc_LogWrite('Test', '[initSkyway]_navigator.mediaDevices.ondevicechange:' + iVideoFlg);  //ANHLD_TEMP
       });
     }
 
@@ -395,6 +404,7 @@ $(function () {
       AspectRatioHeight: selHeight
     }
 
+    fnc_LogWrite('Test', 'dataSend[' + localStream.id +']:' + JSON.stringify(dataSend));  //ANHLD_TEMP
     room.send(dataSend);
 
     fnc_LogWrite('info', 'sendAudioSignal is completed.');
@@ -428,6 +438,8 @@ $(function () {
         track.stop();
       }
     }
+
+    fnc_LogWrite('Test', '[step1]_iDeivcesCnt:' + iDeivcesCnt);  //ANHLD_TEMP
 
     if (videoSource == null) {
       callStatus(STATUS_RETRY);
