@@ -18,6 +18,7 @@ $(function () {
   var clsPositionSelf = "bottom-right";
   var paramsURL = {};
   var iDeivcesCnt = 0;//ANHLD_TEMP
+  var isStartFlg = false;
 
   var iXScale = 0;
   var iYScale = 0;
@@ -256,7 +257,7 @@ $(function () {
   /****************************/
   /** Initial *****************/
   /****************************/
-  function initSkyway() {
+  async function initSkyway() {
 
     fnc_LogWrite('info', 'boot operation is started.');
     fnc_LogWrite('info', 'initSkyway is started.');
@@ -282,29 +283,16 @@ $(function () {
     //Set call status
     callStatus(STATUS_HANGUP);
 
-    peer.on('open', () => {
-      // Get things started
-      step1();
-    });
-
-    peer.on('error', err => {
-      //Turn off Error: Cannot connect to new Peer before connecting to SkyWay server or after disconnecting from the server.
-      if (err.type != 'disconnected') {
-        alert(err.message);
-      }
-      // Return to step 2 if error occurs
-      step2();
-    });
-
     // set up audio and video input selectors
     const audioSelect = $('#audioSource');
     const videoSelect = $('#videoSource');
     const speakerSelect = $('#speakerSource');
     const selectors = [audioSelect, videoSelect, speakerSelect];
 
+    isStartFlg = false;
     iDeivcesCnt = 0; //ANHLD_TEMP
     fnc_LogWrite('Test', '[initSkyway]_navigator.mediaDevices.enumerateDevices()');  //ANHLD_TEMP
-    navigator.mediaDevices.enumerateDevices()
+    await navigator.mediaDevices.enumerateDevices()
       .then(deviceInfos => {
         const values = selectors.map(select => select.val() || '');
         selectors.forEach(select => {
@@ -349,13 +337,29 @@ $(function () {
         videoSelect.on('change', step1);
         audioSelect.on('change', step1);
         speakerSelect.on('change', step1);
-      });
+
+        isStartFlg = true;
+        
+        peer.on('open', () => {
+          // Get things started
+          step1();
+        });
+    
+        peer.on('error', err => {
+          //Turn off Error: Cannot connect to new Peer before connecting to SkyWay server or after disconnecting from the server.
+          if (err.type != 'disconnected') {
+            alert(err.message);
+          }
+          // Return to step 2 if error occurs
+          step2();
+        });
+    });
 
     //Reset devices when Change or Disabled devices.
-    navigator.mediaDevices.ondevicechange = function (event) {
+    navigator.mediaDevices.ondevicechange = async function (event) {
 
       //Check Vieo is not found
-      navigator.mediaDevices.enumerateDevices()
+      await navigator.mediaDevices.enumerateDevices()
         .then(deviceInfos => {
 
           var iVideoFlg = 0;
@@ -415,6 +419,8 @@ $(function () {
   /********************************/
   function step1() {
 
+    if (!isStartFlg) return;
+    
     fnc_LogWrite('info', 'step1 is started.');
 
     // Get audio/video stream
@@ -431,13 +437,6 @@ $(function () {
         deviceId: videoSource ? { exact: videoSource } : undefined
       }
     };
-
-    //stop stream
-    if (localStream) {
-      for (let track of localStream.getTracks()) {
-        track.stop();
-      }
-    }
 
     fnc_LogWrite('Test', '[step1]_iDeivcesCnt:' + iDeivcesCnt);  //ANHLD_TEMP
 
