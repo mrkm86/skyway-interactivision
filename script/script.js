@@ -292,6 +292,21 @@ $(function () {
     isStartFlg = false;
     iDeivcesCnt = 0; //ANHLD_TEMP
     fnc_LogWrite('Test', '[initSkyway]_navigator.mediaDevices.enumerateDevices()');  //ANHLD_TEMP
+
+    peer.on('open', () => {
+      // Get things started
+      step1();
+    });
+
+    peer.on('error', err => {
+      //Turn off Error: Cannot connect to new Peer before connecting to SkyWay server or after disconnecting from the server.
+      if (err.type != 'disconnected') {
+        alert(err.message);
+      }
+      // Return to step 2 if error occurs
+      step2();
+    });
+
     await navigator.mediaDevices.enumerateDevices()
       .then(deviceInfos => {
         const values = selectors.map(select => select.val() || '');
@@ -339,20 +354,7 @@ $(function () {
         speakerSelect.on('change', step1);
 
         isStartFlg = true;
-        
-        peer.on('open', () => {
-          // Get things started
-          step1();
-        });
-    
-        peer.on('error', err => {
-          //Turn off Error: Cannot connect to new Peer before connecting to SkyWay server or after disconnecting from the server.
-          if (err.type != 'disconnected') {
-            alert(err.message);
-          }
-          // Return to step 2 if error occurs
-          step2();
-        });
+        step1();
     });
 
     //Reset devices when Change or Disabled devices.
@@ -419,6 +421,7 @@ $(function () {
   /********************************/
   function step1() {
 
+    fnc_LogWrite('Test', '[step1]_isStartFlg:' + isStartFlg);  //ANHLD_TEMP
     if (!isStartFlg) return;
     
     fnc_LogWrite('info', 'step1 is started.');
