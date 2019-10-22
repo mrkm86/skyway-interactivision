@@ -293,18 +293,28 @@ $(function () {
     iDeivcesCnt = 0; //ANHLD_TEMP
     fnc_LogWrite('Test', '[initSkyway]_navigator.mediaDevices.enumerateDevices()');  //ANHLD_TEMP
 
+    peer.on('close', function() {
+      peer.destroy();
+    });
+
     peer.on('open', () => {
       // Get things started
       step1();
     });
 
     peer.on('error', err => {
+
+      peer.destroy();
+      peer.reconnect();
+      
       //Turn off Error: Cannot connect to new Peer before connecting to SkyWay server or after disconnecting from the server.
       if (err.type != 'disconnected') {
-        alert(err.message);
+        //alert(err.message);
+        fnc_LogWrite('Test', '[initSkyway]_peer.on_error()');  //ANHLD_TEMP
+        window.location.reload();
       }
       // Return to step 2 if error occurs
-      step2();
+      //step2();
     });
 
     await navigator.mediaDevices.enumerateDevices()
@@ -833,7 +843,7 @@ $(function () {
         alert(errorThrown);
         console.log(errorThrown);
       }
-      
+
     });
   }
 
