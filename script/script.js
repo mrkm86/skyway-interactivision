@@ -621,20 +621,20 @@ $(function () {
         interval: 1000,
         thresholds: {
           "video-fractionLost": { //Percent
-            unstable: 0.15,       
-            critical: 0.30
+            unstable: 0.08,       
+            critical: 0.15
           },
           "video-jitter": {   //Second
-            unstable: 0.20,
-            critical: 60
+            unstable: 0.03,
+            critical: 0.1
           },
           "video-jitterBufferDelay": {  //Second
-            unstable: 0.20,
-            critical: 60
+            unstable: 0.05,
+            critical: 0.1
           },
           "video-rtt": {  //Second
-            unstable: 0.20,
-            critical: 60
+            unstable: 0.4,
+            critical: 0.8
           }
         },
         triggerCondition: {
