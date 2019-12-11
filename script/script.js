@@ -231,7 +231,12 @@ $(function () {
       return;
     }
 
-    room = peer.joinRoom('mesh_video_' + window.__SKYWAY_ROOM__, { stream: localStream });
+    //room = peer.joinRoom('mesh_video_' + window.__SKYWAY_ROOM__, { stream: localStream });
+    var roomOptions = {
+      stream: localStream,
+      videoCodec: 'VP9'
+    }
+    room = peer.joinRoom('mesh_video_' + window.__SKYWAY_ROOM__, roomOptions);
 
     //Set call status
     callStatus(STATUS_CALLING);
