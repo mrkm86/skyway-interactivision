@@ -649,14 +649,11 @@ $(function () {
       }
 
       for (var key in room.connections) {
-
         var pc = room.connections[key][0].getPeerConnection();
         
         if (pc == null) continue;
 
         var insight = new RTCStatsInsight(pc, options);
-        var idTest = room.connections[key][0].remoteId;
-        
         insight.on(RTCStatsInsightEvents["video-fractionLost"].key, event => {
           if  (event.level === 'critical') {
             fnc_LogWrite('info', '[video-fractionLost] Resart is Started.');
@@ -690,6 +687,36 @@ $(function () {
         });
 
         insight.watch();
+
+        //Check iceconnection state for RTCPeerconnection
+        pc.oniceconnectionstatechange = function(event) {
+          switch(pc.iceConnectionState) {
+            case "connected":
+              // The connection has become fully connected
+              break;
+
+            case "disconnected":
+              break;
+
+            case "failed":
+              // One or more transports has terminated unexpectedly or in an error
+              break;
+
+            case "closed":
+              // The iceconnection has been closed (ignore End Call)
+              if (!pc.connectionState == 'closed') 
+              {
+                fnc_LogWrite('error', 'The iceConnection has been closed.');
+                window.location.reload();
+                return;
+              }
+              
+              break;
+          }
+
+          console.log("** Check iceconnection state for RTCPeerconnection [" + pc.iceConnectionState +"]");
+          console.log("** Check connection state for RTCPeerconnection [" + pc.connectionState +"]");
+        }
       }
     });
 
