@@ -477,6 +477,7 @@ $(function () {
       localStream = stream;
       localAudioTrack = localStream.getAudioTracks()[0];
       localVideoTrack = localStream.getVideoTracks()[0];
+      localAudioTrack.enabled = false;    //Init new value
       
       //Mute Microphone Event
       localAudioTrack.onmute = function (event) {
