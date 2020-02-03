@@ -166,11 +166,21 @@ $(function () {
 
     fnc_LogWrite('info', 'OnOffMicrophone is started.');
 
+    var isEnabled;
     var ctrl = $('#button-microphone');
-    localAudioTrack.enabled = isOn;
+
+    if (isOn)
+    {
+      isEnabled = true;
+    }
+    else{
+      isEnabled = false;
+    }
+
+    localAudioTrack.enabled = isEnabled;
 
     setTimeout(() => {
-      if (localAudioTrack.enabled) {
+      if (isEnabled) {
         ctrl.removeClass('button-microphone-off');
         ctrl.addClass('button-microphone-on');
         $('#self-mic').addClass('item-visible');
@@ -245,12 +255,11 @@ $(function () {
 
     //Microphone devices is mute
     if (localAudioTrack.muted) {
-      OnOffMicrophone(false);
+      paramsURL["mute"] = true;
     }
-    else {
-      //Turn On/Off Microphone
-      OnOffMicrophone(!paramsURL["mute"]);
-    }
+
+    //Turn On/Off Microphone
+    OnOffMicrophone(!paramsURL["mute"]);
 
     //Display video
     step3(room);
@@ -477,29 +486,33 @@ $(function () {
       localStream = stream;
       localAudioTrack = localStream.getAudioTracks()[0];
       localVideoTrack = localStream.getVideoTracks()[0];
-      localAudioTrack.enabled = false;    //Init new value
-      
-      //Mute Microphone Event
-      localAudioTrack.onmute = function (event) {
-        localAudioTrack.enabled = false;
-        OnOffMicrophone(false);
-      }
-      //unMute Microphone Event
-      localAudioTrack.onunmute = function (event) {
-        localAudioTrack.enabled = true;
-        OnOffMicrophone(true);
-      }
 
-      if (room) {
-        room.replaceStream(stream);
-        return;
-      }
+      //Turn On/Off Microphone
+      OnOffMicrophone(!paramsURL["mute"]);
 
-      //Clear control
-      step2();
+      setTimeout(() => {
+        //Mute Microphone Event
+        localAudioTrack.onmute = function (event) {
+          //localAudioTrack.enabled = false;
+          OnOffMicrophone(false);
+        }
+        //unMute Microphone Event
+        localAudioTrack.onunmute = function (event) {
+          //localAudioTrack.enabled = true;
+          OnOffMicrophone(true);
+        }
 
-      //Join Conference
-      joinConference();
+        if (room) {
+          room.replaceStream(stream);
+          return;
+        }
+
+        //Clear control
+        step2();
+
+        //Join Conference
+        joinConference();
+      }, 1000);
 
     }).catch(err => {
       //Set call status
