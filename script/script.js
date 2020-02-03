@@ -166,21 +166,11 @@ $(function () {
 
     fnc_LogWrite('info', 'OnOffMicrophone is started.');
 
-    var isEnabled;
     var ctrl = $('#button-microphone');
-
-    if (isOn)
-    {
-      isEnabled = true;
-    }
-    else{
-      isEnabled = false;
-    }
-
-    localAudioTrack.enabled = isEnabled;
+    localAudioTrack.enabled = isOn;
 
     setTimeout(() => {
-      if (isEnabled) {
+      if (isOn) {
         ctrl.removeClass('button-microphone-off');
         ctrl.addClass('button-microphone-on');
         $('#self-mic').addClass('item-visible');
