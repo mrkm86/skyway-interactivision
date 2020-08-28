@@ -26,6 +26,8 @@ $(function () {
   var selWidth = 1920;
   var selHeight = 1080;
 
+  fnc_LogWrite('Test_20200824', '01_Start'); //20200824 ANHLD_TEMP (Test Disconnect)
+
   if (!isNaN(window.VIDEO_WIDTH)) {
     selWidth = VIDEO_WIDTH;
   }
@@ -44,6 +46,8 @@ $(function () {
     key: window.__SKYWAY_KEY__,
     debug: 3,
   });
+
+  fnc_LogWrite('Test_20200824', '02_Start'); //20200824 ANHLD_TEMP (Test Disconnect)
 
   //Detect mouse move
   mouseMoveInterval = setInterval(fncShowHideFunctionBar, 1000);
@@ -84,7 +88,56 @@ $(function () {
     });
 
     //Open Setting Modal
-    $('.pure-u-2-3').dblclick(function () {
+    $('.pure-u-2-3').dblclick(async function () {
+
+        // set up audio and video input selectors
+        const audioSelect = $('#audioSource');
+        const videoSelect = $('#videoSource');
+        const speakerSelect = $('#speakerSource');
+        const selectors = [audioSelect, videoSelect, speakerSelect];
+
+        await navigator.mediaDevices.enumerateDevices()
+        .then(deviceInfos => {
+          const values = selectors.map(select => select.val() || '');
+
+          audioSelect.empty();
+          videoSelect.empty();
+          speakerSelect.empty();
+
+          fnc_LogWrite('Test', '[initSkyway]_Devices Length:' + deviceInfos.length);  //ANHLD_TEMP
+          for (let i = 0; i !== deviceInfos.length; ++i) {
+            const deviceInfo = deviceInfos[i];
+            const option = $('<option>').val(deviceInfo.deviceId);
+
+            if (deviceInfo.kind === 'audioinput') {
+              option.text(deviceInfo.label ||
+                'Microphone ' + (audioSelect.children().length + 1));
+              audioSelect.append(option);
+            }
+            else if (deviceInfo.kind === 'videoinput') {
+              option.text(deviceInfo.label ||
+                'Camera ' + (videoSelect.children().length + 1));
+              videoSelect.append(option);
+              iDeivcesCnt++; //ANHLD_TEMP
+              fnc_LogWrite('Test', '[initSkyway]_Camera Devices:' + deviceInfo.label);  //ANHLD_TEMP
+              console.log('Camera Devices:' + deviceInfo.label);
+            }
+            else if (deviceInfo.kind === 'audiooutput') {
+              option.text(deviceInfo.label ||
+                'Speaker ' + (speakerSelect.children().length + 1));
+              speakerSelect.append(option);
+            }
+          }
+
+          selectors.forEach((select, selectorIndex) => {
+            if (Array.prototype.slice.call(select.children()).some(n => {
+              return n.value === values[selectorIndex];
+            })) {
+              select.val(values[selectorIndex]);
+            }
+          });
+      });
+
       $('#model-setting-page').css('display', 'block');
     });
 
@@ -308,6 +361,8 @@ $(function () {
 
     peer.on('error', err => {
 
+      console.error(err); //20200824 ANHLD_TEMP (Test Disconnect)
+      fnc_LogWrite('Test_20200824', '03_peer.on(Error) 01:' + err.message); //20200824 ANHLD_TEMP (Test Disconnect)
       peer.destroy();
       peer.reconnect();
       
@@ -317,6 +372,8 @@ $(function () {
         fnc_LogWrite('Test', '[initSkyway]_peer.on_error()');  //ANHLD_TEMP
         window.location.reload();
       }
+
+      fnc_LogWrite('Test_20200824', '03_peer.on(Error) 02'); //20200824 ANHLD_TEMP (Test Disconnect)
       // Return to step 2 if error occurs
       //step2();
     });
@@ -508,6 +565,11 @@ $(function () {
       //Set call status
       callStatus(STATUS_RETRY);
       console.error(err);
+
+      //20200827 ANHLD_TEMP (Test Disconnect)
+      fnc_LogWrite('error', 'step1 is error (navigator.mediaDevices.getUserMedia).');
+      window.location.reload(); 
+      //20200827 ANHLD_TEMP (Test Disconnect)
     });
 
     fnc_LogWrite('info', 'step1 is completed.');
@@ -876,8 +938,9 @@ $(function () {
       },
 
       error: function (jqXHR, textStatus, errorThrown) {
-        alert(errorThrown);
+        //alert(errorThrown);
         console.log(errorThrown);
+        window.location.reload(); //20200827 ANHLD_TEMP (Test Disconnect)
       }
 
     });
