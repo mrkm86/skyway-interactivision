@@ -26,6 +26,8 @@ $(function () {
   var selWidth = 1920;
   var selHeight = 1080;
 
+  console.log('**** Test_20200908 ****');
+  fnc_LogWrite('Test_20200908', '01_Start'); //20200908 ANHLD_TEMP (Test Disconnect)
   fnc_LogWrite('Test_20200824', '01_Start'); //20200824 ANHLD_TEMP (Test Disconnect)
 
   if (!isNaN(window.VIDEO_WIDTH)) {
@@ -363,8 +365,23 @@ $(function () {
 
       console.error(err); //20200824 ANHLD_TEMP (Test Disconnect)
       fnc_LogWrite('Test_20200824', '03_peer.on(Error) 01:' + err.message); //20200824 ANHLD_TEMP (Test Disconnect)
-      peer.destroy();
-      peer.reconnect();
+      
+      //20200908 ANHLD EDIT START
+      // peer.destroy();
+      // peer.reconnect();
+
+      //Turn off Error: You do not have permission to access this room
+      //Turn off Error: Uncaught RangeError: Maximum call stack size exceeded
+      try {
+        peer.destroy();
+        peer.reconnect();
+      } catch (error) {
+        console.log('>>>peer.destroy (error)');
+        console.log(error);
+        console.log('<<<peer.destroy (error)');
+        window.location.reload();
+      }
+      //20200908 ANHLD EDIT END
       
       //Turn off Error: Cannot connect to new Peer before connecting to SkyWay server or after disconnecting from the server.
       if (err.type != 'disconnected') {
