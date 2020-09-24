@@ -30,6 +30,11 @@ $(function () {
   fnc_LogWrite('Test_20200908', '01_Start'); //20200908 ANHLD_TEMP (Test Disconnect)
   fnc_LogWrite('Test_20200824', '01_Start'); //20200824 ANHLD_TEMP (Test Disconnect)
 
+  //20200923 ANHLD ADD START
+  //Set call status
+  callStatus(STATUS_HANGUP);
+  //20200923 ANHLD ADD END
+
   if (!isNaN(window.VIDEO_WIDTH)) {
     selWidth = VIDEO_WIDTH;
   }
@@ -54,8 +59,50 @@ $(function () {
   //Detect mouse move
   mouseMoveInterval = setInterval(fncShowHideFunctionBar, 1000);
 
-  initSkyway();
-  addEventFunction();
+  //20200923 ANHLD EDIT START
+  // initSkyway();
+  // addEventFunction();
+
+  setTimeout(() => {
+
+    //Add event
+    addEventFunction();
+
+    peer.on('close', function() {
+      peer.destroy();
+    });
+  
+    peer.on('open', () => {
+      initSkyway();
+    });
+  
+    peer.on('error', err => {
+  
+      console.error(err); //20200824 ANHLD_TEMP (Test Disconnect)
+      fnc_LogWrite('Test_20200824', '03_peer.on(Error) 01:' + err.message); //20200824 ANHLD_TEMP (Test Disconnect)
+  
+      try {
+        peer.destroy();
+        peer.reconnect();
+      } catch (error) {
+        console.log('>>>peer.destroy (error)');
+        console.log(error);
+        console.log('<<<peer.destroy (error)');
+        window.location.reload();
+      }
+      
+      //Turn off Error: Cannot connect to new Peer before connecting to SkyWay server or after disconnecting from the server.
+      if (err.type != 'disconnected') {
+        //alert(err.message);
+        fnc_LogWrite('Test', '[initSkyway]_peer.on_error()');  //ANHLD_TEMP
+        window.location.reload();
+      }
+  
+      fnc_LogWrite('Test_20200824', '03_peer.on(Error) 02'); //20200824 ANHLD_TEMP (Test Disconnect)
+    }, 1000);
+  
+  });
+  //20200923 ANHLD EDIT END
 
   /****************************/
   /** Addd Event for control */
@@ -339,8 +386,10 @@ $(function () {
       clsPositionSelf = "bottom-left";
     }
 
-    //Set call status
-    callStatus(STATUS_HANGUP);
+    //20200923 ANHLD DELETE START
+    // //Set call status
+    // callStatus(STATUS_HANGUP);
+    //20200923 ANHLD DELETE END
 
     // set up audio and video input selectors
     const audioSelect = $('#audioSource');
@@ -352,48 +401,51 @@ $(function () {
     iDeivcesCnt = 0; //ANHLD_TEMP
     fnc_LogWrite('Test', '[initSkyway]_navigator.mediaDevices.enumerateDevices()');  //ANHLD_TEMP
 
-    peer.on('close', function() {
-      peer.destroy();
-    });
+    //20200923 ANHLD DELETE START
+    // peer.on('close', function() {
+    //   peer.destroy();
+    // });
 
-    peer.on('open', () => {
-      // Get things started
-      step1();
-    });
+    // peer.on('open', () => {
+    //   // Get things started
+    //   step1();
+    // });
 
-    peer.on('error', err => {
+    // peer.on('error', err => {
 
-      console.error(err); //20200824 ANHLD_TEMP (Test Disconnect)
-      fnc_LogWrite('Test_20200824', '03_peer.on(Error) 01:' + err.message); //20200824 ANHLD_TEMP (Test Disconnect)
+    //   console.error(err); //20200824 ANHLD_TEMP (Test Disconnect)
+    //   fnc_LogWrite('Test_20200824', '03_peer.on(Error) 01:' + err.message); //20200824 ANHLD_TEMP (Test Disconnect)
+
+    //   //20200908 ANHLD EDIT START
+    //   // peer.destroy();
+    //   // peer.reconnect();
+
+    //   //Turn off Error: You do not have permission to access this room
+    //   //Turn off Error: Uncaught RangeError: Maximum call stack size exceeded
+    //   try {
+    //     peer.destroy();
+    //     peer.reconnect();
+    //   } catch (error) {
+    //     console.log('>>>peer.destroy (error)');
+    //     console.log(error);
+    //     console.log('<<<peer.destroy (error)');
+    //     window.location.reload();
+    //   }
+    //   //20200908 ANHLD EDIT END
       
-      //20200908 ANHLD EDIT START
-      // peer.destroy();
-      // peer.reconnect();
+    //   //Turn off Error: Cannot connect to new Peer before connecting to SkyWay server or after disconnecting from the server.
+    //   if (err.type != 'disconnected') {
+    //     //alert(err.message);
+    //     fnc_LogWrite('Test', '[initSkyway]_peer.on_error()');  //ANHLD_TEMP
+    //     window.location.reload();
+    //   }
 
-      //Turn off Error: You do not have permission to access this room
-      //Turn off Error: Uncaught RangeError: Maximum call stack size exceeded
-      try {
-        peer.destroy();
-        peer.reconnect();
-      } catch (error) {
-        console.log('>>>peer.destroy (error)');
-        console.log(error);
-        console.log('<<<peer.destroy (error)');
-        window.location.reload();
-      }
-      //20200908 ANHLD EDIT END
-      
-      //Turn off Error: Cannot connect to new Peer before connecting to SkyWay server or after disconnecting from the server.
-      if (err.type != 'disconnected') {
-        //alert(err.message);
-        fnc_LogWrite('Test', '[initSkyway]_peer.on_error()');  //ANHLD_TEMP
-        window.location.reload();
-      }
+    //   fnc_LogWrite('Test_20200824', '03_peer.on(Error) 02'); //20200824 ANHLD_TEMP (Test Disconnect)
+    //   // Return to step 2 if error occurs
+    //   //step2();
+    // });
 
-      fnc_LogWrite('Test_20200824', '03_peer.on(Error) 02'); //20200824 ANHLD_TEMP (Test Disconnect)
-      // Return to step 2 if error occurs
-      //step2();
-    });
+    //20200923 ANHLD DELETE END
 
     await navigator.mediaDevices.enumerateDevices()
       .then(deviceInfos => {
